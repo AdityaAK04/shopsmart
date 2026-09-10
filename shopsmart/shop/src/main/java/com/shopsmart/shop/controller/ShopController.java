@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/shopsmart/shop")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ShopController {
 
     @Autowired
@@ -51,6 +52,7 @@ public class ShopController {
        Shop updatedShop = shopService.updateShop(id, shopDetails);
        return ResponseEntity.ok(updatedShop);
    }
+
 
 
     @DeleteMapping("/{id}")

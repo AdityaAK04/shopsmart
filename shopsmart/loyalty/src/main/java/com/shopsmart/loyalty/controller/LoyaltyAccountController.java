@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/shopsmart/loyalty")
+@CrossOrigin(origins = "http://localhost:5173")
 public class LoyaltyAccountController {
 
     @Autowired
@@ -74,5 +75,16 @@ public class LoyaltyAccountController {
     @GetMapping("/{id}/points-redeemed")
     public ResponseEntity<Integer> getPointsRedeemed(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getPointsRedeemed(id));
+    }
+    @PatchMapping("/customer/{customerId}/redeem-points")
+    public ResponseEntity<LoyaltyAccount> redeemPointsByCustomer(
+            @PathVariable Integer customerId,
+            @RequestParam Integer points) {
+
+        LoyaltyAccount account = service.getAccountByCustomerId(customerId)
+                .orElseThrow(() -> new RuntimeException("Loyalty account not found for customer ID: " + customerId));
+
+        // FIX: Use getLoyaltyId() since your entity field is named loyaltyId
+        return ResponseEntity.ok(service.redeemPoints(account.getLoyaltyId(), points));
     }
 }

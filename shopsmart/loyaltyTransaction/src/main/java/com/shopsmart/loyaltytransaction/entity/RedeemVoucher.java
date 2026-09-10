@@ -36,6 +36,8 @@ public class RedeemVoucher {
 
     @Column(name = "expiry_date")
     private LocalDateTime expiryDate;
+    @Column(name = "owner_id")
+    private Integer ownerId;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

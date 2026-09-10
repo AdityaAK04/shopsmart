@@ -10,4 +10,6 @@ import java.util.List;
 public interface RedeemVoucherRepository extends JpaRepository<RedeemVoucher, Integer> {
     List<RedeemVoucher> findByCustomerId(Integer customerId);
     List<RedeemVoucher> findByLoyaltyId(Integer loyaltyId);
+    List<RedeemVoucher> findByOwnerId(Integer ownerId);
+    List<RedeemVoucher> findByStatus(String status);
 }

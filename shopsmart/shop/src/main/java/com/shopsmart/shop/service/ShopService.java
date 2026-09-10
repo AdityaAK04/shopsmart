@@ -59,6 +59,11 @@ public class ShopService {
         shop.setAddress(shopDetails.getAddress());
         shop.setOwnerId(shopDetails.getOwnerId());
 
+        // Explicitly update status if provided in the request body
+        if (shopDetails.getStatus() != null) {
+            shop.setStatus(shopDetails.getStatus());
+        }
+
         Shop updatedShop = shopRepository.save(shop);
         log.info("updated shop ID: {}", id);
         return updatedShop;

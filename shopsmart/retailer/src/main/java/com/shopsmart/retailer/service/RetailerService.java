@@ -1,7 +1,9 @@
 package com.shopsmart.retailer.service;
 
+import com.shopsmart.retailer.document.RetailerImage;
 import com.shopsmart.retailer.entity.Retailer;
-import com.shopsmart.retailer.repository.RetailerRepository;
+import com.shopsmart.retailer.repository.mongo.RetailerImageRepository;
+import com.shopsmart.retailer.repository.mysql.RetailerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,9 @@ public class RetailerService {
 
     @Autowired
     private RetailerRepository retailerRepository;
+
+    @Autowired
+    private RetailerImageRepository retailerImageRepository;
 
     public List<Retailer> getAllRetailers() {
         return retailerRepository.findAll();
@@ -26,16 +31,30 @@ public class RetailerService {
         return retailerRepository.save(retailer);
     }
 
-    public Retailer updateRetailer(Integer id, Retailer retailerDetails) {
+    public Retailer updateRetailer(Integer id, Retailer retailerDetails, String profileImage) {
         Retailer retailer = retailerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Retailer not found " + id));
+
         retailer.setOwnerName(retailerDetails.getOwnerName());
         retailer.setOwnerEmail(retailerDetails.getOwnerEmail());
         retailer.setOwnerPassword(retailerDetails.getOwnerPassword());
-        return retailerRepository.save(retailer);
+        Retailer updated = retailerRepository.save(retailer);
+
+        if (profileImage != null) {
+            retailerImageRepository.save(new RetailerImage(id, profileImage));
+        }
+
+        return updated;
+    }
+
+    public String getRetailerImage(Integer id) {
+        return retailerImageRepository.findById(id)
+                .map(RetailerImage::getProfileImage)
+                .orElse(null);
     }
 
     public void deleteRetailer(Integer id) {
         retailerRepository.deleteById(id);
+        retailerImageRepository.deleteById(id);
     }
 }

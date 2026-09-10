@@ -20,5 +20,9 @@ public class Shop {
     private String address;
 
     @Column(name = "owner_id", nullable = false)
-    private Integer ownerId;//this one is like tpo connect to retailer if owner id is present then only rest shop id will be executed otherwise it will cause execption
+    private Integer ownerId;
+
+    // Add this field so status can be saved to the database
+    @Column(name = "status", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'ACTIVE'")
+    private String status = "ACTIVE";
 }

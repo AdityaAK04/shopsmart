@@ -7,47 +7,60 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/shopsmart/retailer")//use this with localhost
+@RequestMapping("/shopsmart/retailer")
+@CrossOrigin(origins = "http://localhost:5173")
 public class RetailerController {
 
     @Autowired
     private RetailerService retailerService;
-    //---1
+
     @GetMapping
     public List<Retailer> getAllRetailers() {
         return retailerService.getAllRetailers();
     }
 
-    //---2
     @GetMapping("/{id}")
-    public ResponseEntity<Retailer> getRetailerById(@PathVariable Integer id) {
+    public ResponseEntity<Map<String, Object>> getRetailerById(@PathVariable Integer id) {
         return retailerService.getRetailerById(id)
-                .map(ResponseEntity::ok)
+                .map(retailer -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("ownerId", retailer.getOwnerId());
+                    response.put("ownerName", retailer.getOwnerName());
+                    response.put("ownerEmail", retailer.getOwnerEmail());
+                    response.put("profileImage", retailerService.getRetailerImage(id));
+                    return ResponseEntity.ok(response);
+                })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    //---3
     @PostMapping
     public ResponseEntity<Retailer> createRetailer(@RequestBody Retailer retailer) {
         Retailer savedRetailer = retailerService.createRetailer(retailer);
         return new ResponseEntity<>(savedRetailer, HttpStatus.CREATED);
     }
 
-    //---4
     @PutMapping("/{id}")
-    public ResponseEntity<Retailer> updateRetailer(@PathVariable Integer id, @RequestBody Retailer retailerDetails) {
+    public ResponseEntity<Retailer> updateRetailer(@PathVariable Integer id, @RequestBody Map<String, Object> payload) {
         try {
-            Retailer updatedRetailer = retailerService.updateRetailer(id, retailerDetails);
+            Retailer details = new Retailer();
+            details.setOwnerName((String) payload.get("ownerName"));
+            details.setOwnerEmail((String) payload.get("ownerEmail"));
+            details.setOwnerPassword((String) payload.get("ownerPassword"));
+
+            String profileImage = (String) payload.get("profileImage");
+
+            Retailer updatedRetailer = retailerService.updateRetailer(id, details, profileImage);
             return ResponseEntity.ok(updatedRetailer);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
-    //---5
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRetailer(@PathVariable Integer id) {
         try {
